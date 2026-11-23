@@ -161,7 +161,15 @@ node -v
 docker --version
 ```
 
-### 2. Abra o projeto no VS Code
+### 2. Baixe o projeto e abra no VS Code
+
+Em um terminal, na pasta onde deseja salvar o projeto, clone o repositório:
+
+```bash
+git clone https://github.com/Malin0406/entreturnos.git
+```
+
+> Sem Git? Na página do repositório, clique em **Code > Download ZIP** e extraia o arquivo.
 
 1. Abra o VS Code → **File > Open Folder…** → selecione a pasta `entreturnos`.
 2. Abra o terminal integrado: **Terminal > New Terminal** (atalho `` Ctrl+` ``).
