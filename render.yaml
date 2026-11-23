@@ -1,0 +1,35 @@
+# Blueprint do Render (https://render.com) — publica o EntreTurnos com um clique.
+# Cria um banco PostgreSQL gratuito e um serviço web que serve a API e o frontend
+# no mesmo endereço. A cada inicialização as migrations são aplicadas e a conta
+# de demonstração é recriada com datas atualizadas.
+databases:
+  - name: entreturnos-db
+    plan: free
+    databaseName: entreturnos
+    user: entreturnos
+
+services:
+  - type: web
+    name: entreturnos
+    runtime: node
+    plan: free
+    buildCommand: >-
+      cd frontend && npm ci --include=dev && npm run build &&
+      cd ../backend && npm ci --include=dev && npx prisma generate && npm run build
+    startCommand: cd backend && npx prisma migrate deploy && npm run seed && node dist/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: NODE_ENV
+        value: production
+      - key: TZ
+        value: America/Sao_Paulo
+      - key: DATABASE_URL
+        fromDatabase:
+          name: entreturnos-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d

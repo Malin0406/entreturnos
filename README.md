@@ -292,6 +292,20 @@ Na tela de login, clique em **"Preencher automaticamente"** (ou digite as creden
 
 ---
 
+## Publicar online (Render)
+
+O arquivo [`render.yaml`](render.yaml) permite publicar o sistema gratuitamente no [Render](https://render.com) a partir deste repositório:
+
+1. Crie uma conta no Render (dá para entrar com o GitHub).
+2. No painel, clique em **New > Blueprint** e selecione este repositório.
+3. Confirme em **Apply**. O Render cria o banco PostgreSQL e o serviço web.
+
+Em produção, a própria API serve as telas do frontend, então tudo fica em um único endereço (`https://<nome>.onrender.com`). A cada inicialização, as migrations são aplicadas e a conta de demonstração é recriada com datas atualizadas. Contas criadas por outras pessoas são mantidas.
+
+> **Limites do plano gratuito:** o serviço "dorme" após cerca de 15 minutos sem acesso, e o primeiro acesso seguinte demora uns 50 segundos. O banco gratuito do Render expira após 30 dias (é possível recriá-lo). Sem serviço de e-mail, a recuperação de senha não envia o link em produção.
+
+---
+
 ## Conta de demonstração
 
 | E-mail | Senha |
