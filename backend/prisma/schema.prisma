@@ -1,0 +1,269 @@
+// EntreTurnos — modelo de dados
+// Todas as datas/horas absolutas (DateTime) são armazenadas em UTC.
+// Horários de compromissos recorrentes ("HH:mm") são interpretados no fuso America/Sao_Paulo.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum CommuteMode {
+  WALK
+  BUS
+  SUBWAY
+  CAR
+  BIKE
+  RIDE_APP
+  OTHER
+}
+
+enum CommutePosition {
+  BEFORE
+  AFTER
+}
+
+enum PomodoroType {
+  FOCUS
+  SHORT_BREAK
+  LONG_BREAK
+}
+
+enum NotificationType {
+  TASK_DUE_SOON
+  TASK_OVERDUE
+  APPOINTMENT_SOON
+  SUGGESTION_AVAILABLE
+  SYSTEM
+}
+
+enum SuggestionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id                    String    @id @default(uuid())
+  name                  String
+  email                 String    @unique
+  passwordHash          String
+  passwordResetToken    String?   @unique
+  passwordResetExpires  DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  preference            UserPreference?
+  tasks                 Task[]
+  appointments          Appointment[]
+  recurringAppointments RecurringAppointment[]
+  commutes              Commute[]
+  pomodoroSessions      PomodoroSession[]
+  notifications         Notification[]
+  suggestions           ScheduleSuggestion[]
+}
+
+// Categorias padrão do sistema (Faculdade, Estágio, Trabalho, Estudos, Pessoal, Outros)
+model Category {
+  id                    String   @id @default(uuid())
+  slug                  String   @unique
+  name                  String
+  color                 String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  tasks                 Task[]
+  appointments          Appointment[]
+  recurringAppointments RecurringAppointment[]
+}
+
+model UserPreference {
+  id                         String   @id @default(uuid())
+  userId                     String   @unique
+  user                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Disponibilidade habitual
+  availabilityStart          String   @default("07:00")
+  availabilityEnd            String   @default("23:00")
+  availableWeekdays          Int[]    @default([0, 1, 2, 3, 4, 5, 6])
+
+  // Preferências de planejamento
+  breakMinutes               Int      @default(10)
+  minSlotMinutes             Int      @default(20)
+  maxTaskBlockMinutes        Int      @default(90)
+  planningHorizonDays        Int      @default(7)
+
+  // Pomodoro
+  pomodoroFocusMinutes       Int      @default(25)
+  pomodoroShortBreakMinutes  Int      @default(5)
+  pomodoroLongBreakMinutes   Int      @default(15)
+  pomodoroCyclesBeforeLong   Int      @default(4)
+
+  // Notificações
+  notifyTaskDeadlines        Boolean  @default(true)
+  notifyAppointments         Boolean  @default(true)
+  notifySuggestions          Boolean  @default(true)
+  deadlineAlertHours         Int      @default(24)
+  appointmentAlertMinutes    Int      @default(60)
+
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
+
+model Task {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId       String
+  category         Category     @relation(fields: [categoryId], references: [id])
+  title            String
+  description      String?
+  dueDate          DateTime?
+  estimatedMinutes Int          @default(30)
+  priority         TaskPriority @default(MEDIUM)
+  status           TaskStatus   @default(PENDING)
+  completedAt      DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  pomodoroSessions PomodoroSession[]
+  suggestions      ScheduleSuggestion[]
+  appointments     Appointment[]
+
+  @@index([userId, status])
+  @@index([userId, dueDate])
+}
+
+model Appointment {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  taskId      String?
+  task        Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  title       String
+  description String?
+  location    String?
+  startAt     DateTime
+  endAt       DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  commutes    Commute[]
+  suggestion  ScheduleSuggestion?
+
+  @@index([userId, startAt])
+}
+
+model RecurringAppointment {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  title       String
+  description String?
+  location    String?
+  weekdays    Int[]     // 0 = domingo ... 6 = sábado
+  startTime   String    // "HH:mm" em America/Sao_Paulo
+  endTime     String    // "HH:mm" em America/Sao_Paulo
+  startDate   String    // "yyyy-MM-dd"
+  endDate     String?   // "yyyy-MM-dd" (inclusive)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  commutes    Commute[]
+
+  @@index([userId])
+}
+
+// Deslocamento. Pode estar vinculado a um compromisso (único ou recorrente),
+// ocupando "durationMinutes" antes ou depois de cada ocorrência,
+// ou ser avulso com horário de início próprio (startAt).
+model Commute {
+  id                     String                @id @default(uuid())
+  userId                 String
+  user                   User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  origin                 String
+  destination            String
+  durationMinutes        Int
+  mode                   CommuteMode           @default(BUS)
+  position               CommutePosition       @default(AFTER)
+  startAt                DateTime?
+  appointmentId          String?
+  appointment            Appointment?          @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  recurringAppointmentId String?
+  recurringAppointment   RecurringAppointment? @relation(fields: [recurringAppointmentId], references: [id], onDelete: Cascade)
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  @@index([userId])
+}
+
+model PomodoroSession {
+  id              String       @id @default(uuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId          String?
+  task            Task?        @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  type            PomodoroType @default(FOCUS)
+  durationMinutes Int
+  startedAt       DateTime
+  endedAt         DateTime
+  completed       Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+
+  @@index([userId, startedAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  dedupeKey String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, read])
+}
+
+model ScheduleSuggestion {
+  id            String           @id @default(uuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId        String
+  task          Task             @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  startAt       DateTime
+  endAt         DateTime
+  score         Int              @default(0)
+  reason        String
+  status        SuggestionStatus @default(PENDING)
+  appointmentId String?          @unique
+  appointment   Appointment?     @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([userId, status])
+}

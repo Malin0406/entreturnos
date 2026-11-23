@@ -1,0 +1,1020 @@
+{
+  "info": {
+    "name": "EntreTurnos API",
+    "description": "Coleção para testar a API do EntreTurnos. Execute \"Login (demo)\" primeiro: o token JWT é salvo automaticamente na variável {{token}}. Substitua :id pelos identificadores retornados nas listagens.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3333/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": ""
+    },
+    {
+      "key": "id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Saúde",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login (demo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set(\"token\", data.token); }",
+                  "pm.test(\"Status 2xx\", () => pm.response.to.be.success);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@entreturnos.com\",\n  \"password\": \"Demo@1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Cadastro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set(\"token\", data.token); }",
+                  "pm.test(\"Status 2xx\", () => pm.response.to.be.success);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pessoa de Teste\",\n  \"email\": \"teste@exemplo.com\",\n  \"password\": \"Senha1234\",\n  \"confirmPassword\": \"Senha1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Usuário autenticado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Esqueci a senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@entreturnos.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Redefinir senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"COLE_O_TOKEN_AQUI\",\n  \"password\": \"NovaSenha123\",\n  \"confirmPassword\": \"NovaSenha123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuário e preferências",
+      "item": [
+        {
+          "name": "Atualizar perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Oliveira\",\n  \"email\": \"demo@entreturnos.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Alterar senha",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me/password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Demo@1234\",\n  \"newPassword\": \"Demo@1234\",\n  \"confirmPassword\": \"Demo@1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obter preferências",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "preferences"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Atualizar preferências",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "preferences"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"availabilityStart\": \"07:00\",\n  \"availabilityEnd\": \"23:00\",\n  \"breakMinutes\": 10,\n  \"pomodoroFocusMinutes\": 25\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tarefas",
+      "item": [
+        {
+          "name": "Listar tarefas (filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks?status=PENDING&sort=dueDate&order=asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "sort",
+                  "value": "dueDate"
+                },
+                {
+                  "key": "order",
+                  "value": "asc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar tarefa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Resumo do capítulo 3\",\n  \"description\": \"Leitura e fichamento\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"dueDate\": \"2026-12-01T23:59:00-03:00\",\n  \"estimatedMinutes\": 45,\n  \"priority\": \"HIGH\",\n  \"status\": \"PENDING\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obter tarefa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Atualizar tarefa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estimatedMinutes\": 60,\n  \"priority\": \"MEDIUM\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Marcar como concluída",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{id}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{id}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Excluir tarefa",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agenda",
+      "item": [
+        {
+          "name": "Eventos do período",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/calendar/events?start=2026-11-23T00:00:00-03:00&end=2026-11-30T00:00:00-03:00",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "calendar",
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "start",
+                  "value": "2026-11-23T00:00:00-03:00"
+                },
+                {
+                  "key": "end",
+                  "value": "2026-11-30T00:00:00-03:00"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar compromissos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar compromisso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Consulta médica\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"startAt\": \"2026-11-28T10:00:00-03:00\",\n  \"endAt\": \"2026-11-28T11:00:00-03:00\",\n  \"location\": \"Clínica\",\n  \"description\": null,\n  \"force\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Atualizar compromisso",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Consulta médica\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"startAt\": \"2026-11-28T14:00:00-03:00\",\n  \"endAt\": \"2026-11-28T15:00:00-03:00\",\n  \"location\": null,\n  \"description\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Excluir compromisso",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compromissos fixos",
+      "item": [
+        {
+          "name": "Listar fixos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring-appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring-appointments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar fixo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recurring-appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring-appointments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Inglês\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"weekdays\": [\n    6\n  ],\n  \"startTime\": \"09:00\",\n  \"endTime\": \"11:00\",\n  \"startDate\": \"2026-11-23\",\n  \"endDate\": null,\n  \"location\": null,\n  \"description\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Atualizar fixo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recurring-appointments/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring-appointments",
+                "{{id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Inglês\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"weekdays\": [\n    6\n  ],\n  \"startTime\": \"09:30\",\n  \"endTime\": \"11:30\",\n  \"startDate\": \"2026-11-23\",\n  \"endDate\": \"2027-06-30\",\n  \"location\": null,\n  \"description\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Excluir fixo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring-appointments/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring-appointments",
+                "{{id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Deslocamentos",
+      "item": [
+        {
+          "name": "Listar deslocamentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/commutes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "commutes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar deslocamento avulso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/commutes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "commutes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origin\": \"Casa\",\n  \"destination\": \"Clínica\",\n  \"durationMinutes\": 30,\n  \"mode\": \"BUS\",\n  \"position\": \"AFTER\",\n  \"startAt\": \"2026-11-28T09:20:00-03:00\",\n  \"appointmentId\": null,\n  \"recurringAppointmentId\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Excluir deslocamento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/commutes/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "commutes",
+                "{{id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Planejamento inteligente",
+      "item": [
+        {
+          "name": "Horários livres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/planning/free-slots?days=7",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "planning",
+                "free-slots"
+              ],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Gerar sugestões",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/planning/suggestions/generate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "planning",
+                "suggestions",
+                "generate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar sugestões",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/planning/suggestions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "planning",
+                "suggestions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Aceitar sugestão",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/planning/suggestions/{{id}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "planning",
+                "suggestions",
+                "{{id}}",
+                "accept"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Recusar sugestão",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/planning/suggestions/{{id}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "planning",
+                "suggestions",
+                "{{id}}",
+                "reject"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pomodoro",
+      "item": [
+        {
+          "name": "Registrar sessão",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pomodoro-sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pomodoro-sessions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": null,\n  \"type\": \"FOCUS\",\n  \"durationMinutes\": 25,\n  \"startedAt\": \"2026-11-23T14:00:00-03:00\",\n  \"endedAt\": \"2026-11-23T14:25:00-03:00\",\n  \"completed\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar sessões",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pomodoro-sessions?limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pomodoro-sessions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Estatísticas de hoje",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pomodoro-sessions/today",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pomodoro-sessions",
+                "today"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notificações, relatórios e dashboard",
+      "item": [
+        {
+          "name": "Listar notificações",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Marcar como lida",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/{{id}}/read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "{{id}}",
+                "read"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Marcar todas como lidas",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Relatório de produtividade",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/summary?weeks=8",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "weeks",
+                  "value": "8"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
