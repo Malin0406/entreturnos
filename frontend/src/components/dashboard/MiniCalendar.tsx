@@ -51,7 +51,7 @@ export function MiniCalendar() {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-sm font-bold capitalize text-ink-900">{monthFmt.format(dateFromKey(firstKey))}</p>
+        <p className="text-sm font-bold text-ink-900 first-letter:uppercase">{monthFmt.format(dateFromKey(firstKey))}</p>
         <div className="flex gap-1">
           <button type="button" onClick={() => shiftMonth(-1)} className="rounded-lg p-1.5 text-ink-500 hover:bg-ink-100" aria-label="Mês anterior">
             <ChevronLeft className="h-4 w-4" />
